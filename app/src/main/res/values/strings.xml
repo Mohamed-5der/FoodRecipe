@@ -1,0 +1,52 @@
+<resources>
+<string name="app_name">FireBaselogin</string>
+<string name="login_title">Log In</string>
+<string name="login_subtitle">Please sign in to your existing account</string>
+<string name="email_label">Email</string>
+<string name="email_placeholder">Email@gmail.com</string>
+<string name="password_label">Password</string>
+<string name="edit_pass">Edit Password</string>
+<string name="password_placeholder">Password</string>
+<string name="forgot_password">Forget Password?</string>
+<string name="login_button">Log In</string>
+<string name="dont_have_account">Don’t have an account? </string>
+<string name="sign_up">Sign Up</string>
+<string name="or">Or</string>
+    <string name="signup_title">Sign up</string>
+    <string name="signup_subtitle">Please sign up to get started</string>
+    <string name="name_label">Name</string>
+    <string name="name_placeholder">UserName</string>
+    <string name="confirm_password_label">Confirm Password</string>
+    <string name="confirm_password_placeholder">Confirm Password</string>
+    <string name="sign_up_button">Sign Up</string>
+    <string name="default_web_client_id">1059038719934-kvfqrb4tn64dnvvh9cjb89nd0s7f3t48.apps.googleusercontent.com</string>
+    <string name="featured">Featured</string>
+    <string name="good_morning">Good Morning</string>
+    <string name="category">Category</string>
+    <string name="meals">Meals</string>
+    <string name="search">Search</string>
+    <string name="popular">Popular Recipes</string>
+    <string name="dish_of_the_day">Dish of the day</string>
+    <string name="sea_all">Sea All</string>
+    <string name="breakfast">Breakfast</string>
+    <string name="lunch">Lunch</string>
+    <string name="dinner">Dinner</string>
+    <string name="dessert">Dessert</string>
+    <string name="drink">Drink</string>
+    <string name="profile">Profile</string>
+    <string name="setting">Setting</string>
+    <string name="logout">Logout</string>
+    <string name="about">About</string>
+    <string name="email">Email</string>
+    <string name="phone">Phone</string>
+    <string name="save">Save</string>
+
+
+
+
+
+
+
+
+
+</resources>

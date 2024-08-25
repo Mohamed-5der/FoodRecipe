@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1059038719934",
+    "project_id": "fire-base-project-a4d1a",
+    "storage_bucket": "fire-base-project-a4d1a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1059038719934:android:badede8315609f983c13ef",
+        "android_client_info": {
+          "package_name": "com.khedr.firebaselogin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC91OSgyRCzke2d9P8vA8dNRR6pAWVLMng"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
