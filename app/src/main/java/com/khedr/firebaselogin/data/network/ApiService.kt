@@ -15,5 +15,7 @@ interface ApiService  {
     suspend fun getMealsBySearch(@retrofit2.http.Query("s") searchMeal: String):retrofit2.Response <Food>
     @GET("filter.php")
     suspend fun getMealsByCategory(@retrofit2.http.Query("c") category: String):retrofit2.Response <Meals>
+    @GET("lookup.php")
+    suspend fun getMealById(@retrofit2.http.Query("i") id: String):retrofit2.Response <Food>
 
 }

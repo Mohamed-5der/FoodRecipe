@@ -74,7 +74,6 @@ class HomeScreen (val context: Context): Screen {
     fun MainScreen() {
         val selectedTabIndex = remember { mutableStateOf(1) }
         Scaffold(
-
             floatingActionButtonPosition = FabPosition.Center,
             floatingActionButton = {
                 FloatingActionButton(

@@ -11,5 +11,7 @@ class NetworkRepository @Inject constructor(val apiService: ApiService) {
     suspend fun getRandomMeal() = apiService.getRandomMeal()
     suspend fun getMealBySearch(searchMeal: String) = apiService.getMealsBySearch(searchMeal)
     suspend fun getMealByCategory(category: String) = apiService.getMealsByCategory(category)
+    suspend fun getMealById(id: String) = apiService.getMealById(id)
+
 
 }

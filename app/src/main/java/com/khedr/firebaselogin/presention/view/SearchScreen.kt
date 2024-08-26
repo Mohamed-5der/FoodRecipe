@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme.colors
@@ -33,6 +34,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,28 +49,40 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import coil.compose.AsyncImage
 import com.khedr.firebaselogin.R
+import com.khedr.firebaselogin.presention.viewModel.SearchViewModel
 import java.nio.file.WatchEvent
 
 class SearchScreen :Screen {
+    lateinit var searchViewModel: SearchViewModel
+    lateinit var navigator :Navigator
+
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
+         navigator = LocalNavigator.currentOrThrow
+        searchViewModel = hiltViewModel()
         val searchText = remember { mutableStateOf("") }
+        searchViewModel.getMeals(searchText.value)
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Row (
+            Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
-            ){
-                IconButton(onClick = { navigator.pop()},modifier = Modifier.size(40.dp)) {
-                    Icon(painter = painterResource(id = R.drawable.arrow_left),contentDescription = "Back",)
+            ) {
+                IconButton(onClick = { navigator.pop() }, modifier = Modifier.size(40.dp)) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.arrow_left),
+                        contentDescription = "Back",
+                    )
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
@@ -77,7 +91,7 @@ class SearchScreen :Screen {
                     fontFamily = senFontFamily,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
-                    )
+                )
                 Spacer(modifier = Modifier.weight(1.2f))
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -100,83 +114,85 @@ class SearchScreen :Screen {
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
             )
+            Spacer(modifier = Modifier.height(8.dp))
             CategoryCard()
 
-            }
-
         }
 
     }
+
+
     @Composable
     fun CategoryCard() {
+        val mealsSearch = searchViewModel.meals.collectAsState(initial = emptyList())
         LazyColumn {
-           items(10) {
-               Spacer(modifier = Modifier.height(16.dp))
-               Card(
-                   shape = RoundedCornerShape(16.dp),
-                   modifier = Modifier
-                       .fillMaxWidth()
-                   ,
-                   elevation = CardDefaults.cardElevation(8.dp),
-                   colors = CardDefaults.cardColors(containerColor = Color.White)
-               ) {
-                   Row(
-                       modifier = Modifier
-                           .fillMaxWidth()
-                           .padding(16.dp),
-                       verticalAlignment = Alignment.CenterVertically
-                   ) {
-                       Image(
-                           painter = painterResource(id = R.drawable.food),
-                           contentDescription = null,
-                           contentScale = ContentScale.Crop,
-                           modifier = Modifier
-                               .size(80.dp)
-                               .clip(RoundedCornerShape(8.dp))
-                       )
-                       Spacer(modifier = Modifier.width(16.dp))
-                       Column(
-                           modifier = Modifier
-                               .weight(1f)
-                       ) {
-                           Text(
-                               text = "Food Title",
-                               fontWeight = FontWeight.Bold,
-                               fontSize = 18.sp,
-                               color = Color(0xFF1D1E2C)
-                           )
-                           Spacer(modifier = Modifier.height(8.dp))
-                           Row(
-                               verticalAlignment = Alignment.CenterVertically
-                           ) {
-                               Image(
-                                   painter = painterResource(id = R.drawable.food),
-                                   contentDescription = null,
-                                   contentScale = ContentScale.Crop,
-                                   modifier = Modifier
-                                       .size(24.dp)
-                                       .clip(CircleShape)
-                               )
-                               Spacer(modifier = Modifier.width(8.dp))
-                               Text(
-                                   text = "Food",
-                                   fontSize = 14.sp,
-                                   color = Color(0xFF7E8A9A)
-                               )
-                           }
-                       }
-                       Image(painter = painterResource(id = R.drawable.arrow_right), contentDescription = "",
-                           modifier = Modifier
-                               .size(24.dp)
-                               .clickable {
-                                   // navigator.push(FoodDetailsScreen())
-                               })
+            items(mealsSearch.value.sortedBy { it.strCategory } ) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth().padding(bottom = 8.dp),
+                    elevation = CardDefaults.cardElevation(8.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AsyncImage(
+                            model = it.strMealThumb,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                        ) {
+                            Text(
+                                text = it.strMeal ?: "",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = Color(0xFF1D1E2C)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                AsyncImage(
+                                    model = it.strMealThumb,
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .clip(CircleShape)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = it.strCategory ?: "",
+                                    fontSize = 14.sp,
+                                    color = Color(0xFF7E8A9A)
+                                )
+                            }
+                        }
+                        Image(painter = painterResource(id = R.drawable.arrow_right),
+                            contentDescription = "",
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clickable {
+                                   navigator.push(FoodDetailsScreen(it.idMeal?:""))
+                                })
 
-                   }
-               }
+                    }
+                }
             }
 
         }
 
     }
-
+}
