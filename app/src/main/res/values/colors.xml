@@ -10,4 +10,5 @@
     <color name="darkBlue">#0A2533</color>
     <color name="border">#7E939E</color>
     <color name="orange">#fF7622</color>
+    <color name="background">#FDF9FC</color>
 </resources>

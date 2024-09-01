@@ -241,9 +241,8 @@ class SignupScreen(val firebaseViewModel: FireBaseViewModel) : Screen {
 
 
     fun register(email: String, password: String, navigator: Navigator, context: Context){
-
         firebaseViewModel.register(email,password,{
-            navigator.push(HomeScreen(context))
+            navigator.push(HomeScreen())
             Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT).show()
         },{
             Toast.makeText(context, "Registration failed", Toast.LENGTH_SHORT).show()

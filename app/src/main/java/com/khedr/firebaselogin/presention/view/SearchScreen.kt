@@ -1,9 +1,6 @@
 package com.khedr.firebaselogin.presention.view
 
-import android.widget.ImageButton
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -57,15 +54,15 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import com.khedr.firebaselogin.R
 import com.khedr.firebaselogin.presention.viewModel.SearchViewModel
-import java.nio.file.WatchEvent
 
 class SearchScreen :Screen {
     lateinit var searchViewModel: SearchViewModel
     lateinit var navigator :Navigator
 
+
     @Composable
     override fun Content() {
-         navigator = LocalNavigator.currentOrThrow
+        navigator = LocalNavigator.currentOrThrow
         searchViewModel = hiltViewModel()
         val searchText = remember { mutableStateOf("") }
         searchViewModel.getMeals(searchText.value)
@@ -120,8 +117,6 @@ class SearchScreen :Screen {
         }
 
     }
-
-
     @Composable
     fun CategoryCard() {
         val mealsSearch = searchViewModel.meals.collectAsState(initial = emptyList())
@@ -131,7 +126,8 @@ class SearchScreen :Screen {
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
-                        .fillMaxWidth().padding(bottom = 8.dp),
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
                     elevation = CardDefaults.cardElevation(8.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
@@ -185,7 +181,8 @@ class SearchScreen :Screen {
                             modifier = Modifier
                                 .size(24.dp)
                                 .clickable {
-                                   navigator.push(FoodDetailsScreen(it.idMeal?:""))
+                                  navigator.push(FoodDetailsScreen(it.idMeal ?: ""))
+                                 //   Navigator(screen = FoodDetailsScreen(it.idMeal ?: ""))
                                 })
 
                     }

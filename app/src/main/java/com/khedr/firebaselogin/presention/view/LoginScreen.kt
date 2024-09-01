@@ -3,6 +3,7 @@ package com.khedr.firebaselogin.presention.view
 import FireBaseViewModel
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,7 +38,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.media3.common.util.Log
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
@@ -62,7 +62,7 @@ class LoginScreen(private val fireBaseViewModel: FireBaseViewModel) : Screen {
 
         val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             fireBaseViewModel.handleSignInResult(result.data, {
-                navigator.push(HomeScreen(context))
+                navigator.push(HomeScreen())
             }, { error ->
                 Toast.makeText(context, "Sign-in failed: $error", Toast.LENGTH_SHORT).show()
                 android.util.Log.e("LoginScreen", "Sign-in failed: $error")
@@ -183,7 +183,12 @@ class LoginScreen(private val fireBaseViewModel: FireBaseViewModel) : Screen {
 
                         Button(
                             onClick = {
-                                login(email.value,password.value,context,navigator)
+                                if (email.value.isEmpty() || password.value.isEmpty()) {
+                                    Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                                }else{
+                                    login(email.value,password.value,context,navigator)
+
+                                }
                             },
                             modifier = androidx.compose.ui.Modifier
                                 .fillMaxWidth()
@@ -270,12 +275,17 @@ class LoginScreen(private val fireBaseViewModel: FireBaseViewModel) : Screen {
         }
     }
     fun login(email: String, password: String, context: Context, navigator: Navigator){
-        fireBaseViewModel.login(email,password,{
-            Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
-            navigator.push(HomeScreen(context))
-        },{
-            Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show() }
-        )
+        try {
+            fireBaseViewModel.login(email,password,{
+                Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
+                navigator.push(HomeScreen())
+            },{
+                Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show() }
+            )
+        }catch (e:Exception){
+            Log.e("mohamed", "login: ${e.message}")
+        }
+
 
     }
 
