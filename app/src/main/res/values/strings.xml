@@ -1,6 +1,7 @@
 <resources>
-<string name="app_name">FireBaselogin</string>
+<string name="app_name">Master Chif</string>
 <string name="login_title">Log In</string>
+<string name="welcome_title">Welcome Again !</string>
 <string name="login_subtitle">Please sign in to your existing account</string>
 <string name="email_label">Email</string>
 <string name="email_placeholder">Email@gmail.com</string>
@@ -25,6 +26,7 @@
     <string name="category">Category</string>
     <string name="meals">Meals</string>
     <string name="search">Search</string>
+    <string name="favorite">Favorite</string>
     <string name="popular">Popular Recipes</string>
     <string name="dish_of_the_day">Dish of the day</string>
     <string name="sea_all">Sea All</string>
@@ -40,6 +42,7 @@
     <string name="email">Email</string>
     <string name="phone">Phone</string>
     <string name="save">Save</string>
+    <string name="submit">Submit</string>
 
 
 

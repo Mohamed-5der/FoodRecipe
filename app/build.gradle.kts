@@ -114,8 +114,11 @@ dependencies {
     // Navigation Compose for navigation between screens
     implementation ("androidx.navigation:navigation-compose:2.6.0")
     implementation ("androidx.compose.material:material:1.5.0")
-
+    implementation ("com.google.accompanist:accompanist-systemuicontroller:0.29.0-alpha")
     implementation ("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
+    implementation("androidx.compose.material3:material3:1.1.0")
+
+
 
 
 }

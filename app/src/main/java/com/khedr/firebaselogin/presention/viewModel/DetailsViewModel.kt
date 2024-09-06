@@ -15,19 +15,26 @@ import javax.inject.Inject
 class DetailsViewModel@Inject constructor(private val repository: NetworkRepository):ViewModel() {
     private val _mealDetails = MutableStateFlow<Food?>(null)
     val mealDetails : StateFlow<Food?> get() = _mealDetails
-
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> get() = _isLoading
     fun getMealDetails(id:String){
         viewModelScope.launch {
             try {
+                _isLoading.value = true
                 val response = repository.getMealById(id)
                 if (response.isSuccessful){
                     _mealDetails.value = response.body()
+                    _isLoading.value = false
                 }else{
                     Log.e("mohamed",response.message())
                 }
         }catch (e:Exception){
             Log.e("mohamed",e.message.toString())
-          }
+          }finally {
+                _isLoading.value = false
+
+
+            }
         }
     }
 }

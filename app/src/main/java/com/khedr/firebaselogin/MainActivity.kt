@@ -9,19 +9,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 import cafe.adriel.voyager.navigator.Navigator
 import com.khedr.firebaselogin.presention.view.HomeScreen
+import com.khedr.firebaselogin.presention.view.SplashScreen
 
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    lateinit var fireBaseViewModel : FireBaseViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-                fireBaseViewModel = hiltViewModel()
-               // Navigator(screen = SplashScreen(fireBaseViewModel))
-                Navigator(screen = HomeScreen())
+               Navigator(screen = SplashScreen())
+             //   Navigator(screen = HomeScreen())
             }
 
     }

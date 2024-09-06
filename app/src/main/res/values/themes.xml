@@ -1,6 +1,9 @@
 <resources>
     <style name="Theme.FireBaselogin" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/orange</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:navigationBarColor">@color/white</item>
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:colorBackground">@color/white</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowTranslucentStatus">true</item>
     </style>

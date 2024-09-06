@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.khedr.firebaselogin.data.model.Categories
 import com.khedr.firebaselogin.data.model.Meals
+import com.khedr.firebaselogin.data.model.MealsByCategory
 import com.khedr.firebaselogin.data.repository.NetworkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,17 +21,22 @@ class HomeViewModel @Inject constructor(
     private val application: Application
 ) : ViewModel() {
 
-    private val _categories = MutableStateFlow<ArrayList<Categories>?>(null)
-    val categories: StateFlow<ArrayList<Categories>?> get() = _categories
+    private val _categories = MutableStateFlow<List<Categories>>(emptyList())
+    val categories: StateFlow<List<Categories>> get() = _categories
 
-    private val _meals = MutableStateFlow<ArrayList<Meals>?>(null)
-    val meals: StateFlow<ArrayList<Meals>?> get() = _meals
+    private val _meals = MutableStateFlow<List<Meals>>(emptyList())
+    val meals: StateFlow<List<Meals>> get() = _meals
 
-    private val _dishOfDay = MutableStateFlow<ArrayList<Meals>?>(null)
-    val dishOfDay: StateFlow<ArrayList<Meals>?> get() = _dishOfDay
+    private val _mealsByCategory = MutableStateFlow<List<MealsByCategory>>(emptyList())
+    val mealsByCategory: StateFlow<List<MealsByCategory>> get() = _mealsByCategory
+
+    private val _dishOfDay = MutableStateFlow<List<Meals>>(emptyList())
+    val dishOfDay: StateFlow<List<Meals>> get() = _dishOfDay
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
+    private val _isLoadingBottomSheet = MutableStateFlow(false)
+    val isLoadingBottomSheet: StateFlow<Boolean> get() = _isLoadingBottomSheet
 
     init {
         getCategories()
@@ -44,7 +50,7 @@ class HomeViewModel @Inject constructor(
             try {
                 val response = repository.getAllCategories()
                 if (response.isSuccessful) {
-                    _categories.value = response.body()?.categories
+                    _categories.value = response.body()?.categories ?: emptyList()
                 } else {
                     showToast("Error Network: ${response.message()}")
                 }
@@ -63,7 +69,7 @@ class HomeViewModel @Inject constructor(
             try {
                 val response = repository.getRandomMeal()
                 if (response.isSuccessful) {
-                    _dishOfDay.value = response.body()?.meals
+                    _dishOfDay.value = response.body()?.meals ?: emptyList()
                 } else {
                     showToast("Error Network: ${response.message()}")
                 }
@@ -82,7 +88,7 @@ class HomeViewModel @Inject constructor(
             try {
                 val response = repository.getMealBySearch(searchMeal)
                 if (response.isSuccessful) {
-                    _meals.value = response.body()?.meals
+                    _meals.value = response.body()?.meals ?: emptyList()
                 } else {
                     showToast("Error Network: ${response.message()}")
                 }
@@ -95,9 +101,26 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun showToast(message: String) {
+    fun getMealsByCategory(category: String) {
         viewModelScope.launch {
-            Toast.makeText(application, message, Toast.LENGTH_SHORT).show()
+
+            try {
+                val response = repository.getMealByCategory(category)
+                if (response.isSuccessful) {
+                    _mealsByCategory.value = response.body()?.mealsByCategory ?: emptyList()
+
+                } else {
+                    showToast("Error Network: ${response.message()}")
+                    //_isLoadingBottomSheet.value = false
+                }
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "getMealsByCategory: ${e.message}", e)
+                showToast("Error Network: ${e.localizedMessage}")
+            }
         }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(application.applicationContext, message, Toast.LENGTH_SHORT).show()
     }
 }

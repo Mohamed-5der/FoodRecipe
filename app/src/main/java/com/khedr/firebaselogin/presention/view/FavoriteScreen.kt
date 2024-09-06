@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,11 +24,12 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,27 +54,27 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.khedr.firebaselogin.R
-import com.khedr.firebaselogin.presention.viewModel.SearchViewModel
+import com.khedr.firebaselogin.presention.viewModel.FavoriteDbViewModel
 
-class SearchScreen :Screen {
-    lateinit var searchViewModel: SearchViewModel
-    lateinit var navigator :Navigator
+class FavoriteScreen : Screen {
+    lateinit var favoriteViewModel: FavoriteDbViewModel
+    lateinit var navigator: Navigator
+    lateinit var searchText : MutableState<String>
 
-
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter",
+        "UnusedMaterial3ScaffoldPaddingParameter"
+    )
     @Composable
     override fun Content() {
-        navigator = LocalNavigator.currentOrThrow
-        searchViewModel = hiltViewModel()
-        val searchText = remember { mutableStateOf("") }
-        searchViewModel.getMeals(searchText.value)
-
+         favoriteViewModel = hiltViewModel()
+         navigator = LocalNavigator.currentOrThrow
+         searchText = remember { mutableStateOf("") }
         Scaffold (
             containerColor = Color.White,
             topBar = {
                 TopAppBar(modifier = Modifier.background(Color.White),
                     backgroundColor = Color.White,
-                    title = { androidx.compose.material.Text("Search", modifier = Modifier.fillMaxWidth(),
+                    title = { androidx.compose.material.Text("Favorite", modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
                         fontFamily = poppins,
                         fontSize = 23.sp,
@@ -84,17 +84,8 @@ class SearchScreen :Screen {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 60.dp, start = 16.dp, end = 16.dp)
+                    .padding(top = 80.dp, start = 16.dp, end = 16.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
-
-                ) {
-
-                }
-                Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
                     value = searchText.value, onValueChange = { searchText.value = it },
                     modifier = Modifier
@@ -103,12 +94,12 @@ class SearchScreen :Screen {
                     leadingIcon = {
                         Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
                     },
-                    placeholder = { Text(text = stringResource(id = R.string.search)) },
+                    placeholder = { androidx.compose.material3.Text(text = stringResource(id = R.string.favorite)) },
                     shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(colorResource(id = R.color.darkBlue))
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(
+                androidx.compose.material3.Text(
                     text = stringResource(id = R.string.category),
                     fontFamily = poppins,
                     fontWeight = FontWeight.Bold,
@@ -120,20 +111,24 @@ class SearchScreen :Screen {
             }
         }
 
-
     }
+
     @Composable
     fun CategoryCard() {
-        val mealsSearch = searchViewModel.meals.collectAsState(initial = emptyList())
+        val mealsSearch = favoriteViewModel.favRecipes.collectAsState()
         LazyColumn {
-            items(mealsSearch.value.sortedBy { it.strCategory } ) {
-                Spacer(modifier = Modifier.height(8.dp))
+            items(mealsSearch.value?.filter {
+                it.strMeal?.contains(searchText.value, ignoreCase = true) == true
+            } ?: emptyList()) {
+                Spacer(modifier = Modifier.height(4.dp))
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    elevation = CardDefaults.cardElevation(8.dp),
+                        .padding(bottom = 8.dp).clickable {
+                            navigator.push(FoodDetailsScreen(it.idMeal ?: ""))
+                        },
+                    elevation = CardDefaults.cardElevation(4.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Row(
@@ -147,7 +142,8 @@ class SearchScreen :Screen {
                                 .data(it?.strMealThumb)
                                 .crossfade(true)
                                 .placeholder(R.drawable.logo2)
-                                .error(R.drawable.logo2)
+                                .error(R.drawable.logo2
+                                )
                                 .build(),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
@@ -160,7 +156,7 @@ class SearchScreen :Screen {
                             modifier = Modifier
                                 .weight(1f)
                         ) {
-                            Text(
+                            androidx.compose.material3.Text(
                                 text = it.strMeal ?: "",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
@@ -179,27 +175,24 @@ class SearchScreen :Screen {
                                         .clip(CircleShape)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = it.strCategory ?: "",
-                                    fontSize = 14.sp,
-                                    color = Color(0xFF7E8A9A)
-                                )
                             }
                         }
-                        Image(painter = painterResource(id = R.drawable.arrow_right),
+                        Image(painter = painterResource(id = R.drawable.heart_select),
                             contentDescription = "",
                             modifier = Modifier
                                 .size(24.dp)
                                 .clickable {
-                                  navigator.push(FoodDetailsScreen(it.idMeal ?: ""))
-                                 //   Navigator(screen = FoodDetailsScreen(it.idMeal ?: ""))
+                                    favoriteViewModel.deleteFavRecipe(it.idMeal?:"")
                                 })
 
                     }
                 }
+                Spacer(modifier = Modifier.height(4 .dp))
+
             }
 
         }
 
     }
+
 }

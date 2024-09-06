@@ -1,9 +1,8 @@
 package com.khedr.firebaselogin.presention.view
 
 import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.net.Uri
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -15,24 +14,23 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -42,9 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.LifecycleOwner
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
@@ -52,25 +48,92 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import com.khedr.firebaselogin.R
 import com.khedr.firebaselogin.data.model.Meals
+import com.khedr.firebaselogin.data.model.Recipe
 import com.khedr.firebaselogin.presention.viewModel.DetailsViewModel
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import com.khedr.firebaselogin.presention.viewModel.FavoriteDbViewModel
 import kotlin.random.Random
 
 class FoodDetailsScreen(private val id: String) : Screen {
 lateinit var navigator : Navigator
+lateinit var favoriteViewModel : FavoriteDbViewModel
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
         val detailsViewModel: DetailsViewModel = hiltViewModel()
+        favoriteViewModel = hiltViewModel()
         detailsViewModel.getMealDetails(id)
-            FoodDetails(detailsViewModel)
+        val isLoading by detailsViewModel.isLoading.collectAsState()
+//        Scaffold(
+//            containerColor = Color.White,
+//            topBar = {
+//                Row(
+//                    horizontalArrangement = Arrangement.SpaceBetween,
+//                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+//                ) {
+//                    androidx.compose.material.TopAppBar(modifier = Modifier
+//                        .background(Color.White)
+//                        .height(80.dp),
+//                        backgroundColor = Color.White,
+//                        navigationIcon = {
+//                            IconButton(
+//                                onClick = { navigator.pop() },
+//                                modifier = Modifier.padding(top = 20.dp)
+//                            ) {
+//                                Icon(
+//                                    imageVector = Icons.Default.ArrowBack,
+//                                    contentDescription = null
+//                                )
+//                            }
+//                        },
+//                        title = {
+//                            Spacer(modifier = Modifier.weight(0.4f))
+//                            androidx.compose.material.Text(
+//                                "Profile", modifier = Modifier
+//                                    .padding(top = 20.dp),
+//                                fontFamily = poppins,
+//                                fontSize = 23.sp,
+//                                fontWeight = FontWeight.SemiBold
+//                            )
+//                            Spacer(modifier = Modifier.weight(0.8f))
+//                        },
+//                        actions = {
+//                            IconButton(
+//                                onClick = { /* Handle favorite icon click */ },
+//                                modifier = Modifier.padding(top = 20.dp)
+//                            ) {
+//                                Icon(
+//                                    imageVector = /* Your favorite icon image vector */,
+//                                    contentDescription = "Favorite"
+//                                )
+//                            }
+//                        }
+//                    )
+//                }
+//
+//            }
+//        ){
+//
+//        }
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Color.Black)
+            }
+        } else {
+
+        }
+        FoodDetails(detailsViewModel)
+
 
     }
 
     @Composable
     fun FoodDetails(detailsViewModel: DetailsViewModel) {
         navigator = LocalNavigator.currentOrThrow
+        val favoriteIds by favoriteViewModel.favoriteIds.collectAsState()
+
         Box(modifier = Modifier.fillMaxSize()) {
             detailsViewModel.mealDetails.collectAsState().value?.let { mealDetails ->
                 AsyncImage(
@@ -88,29 +151,54 @@ lateinit var navigator : Navigator
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 20.dp)
-                ) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = "Close",
-                            modifier = Modifier
-                                .padding(20.dp).size(24.dp)
-                                .clickable {
-                                    navigator.pop()
-                                }
-                        )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
+                        .padding(top = 30.dp, start = 8.dp, end = 8.dp)
+                ) { Card(
+                    modifier = Modifier.size(48.dp).padding(4.dp),
+                    shape = RoundedCornerShape(20),
+                ){
                     Icon(
-                        painterResource(id = R.drawable.heart),
+                        Icons.Default.ArrowBack,
                         contentDescription = "Close",
-                        modifier = Modifier
-                            .padding(20.dp).size(24.dp)
+                        modifier = Modifier.padding(8.dp)
+                            .size(24.dp)
                             .clickable {
                                 navigator.pop()
-                            }
+                            },
+                        tint = Color.Black
                     )
+                }
+
+
+                    Spacer(modifier = Modifier.weight(1f))
+                    val isFavorite = remember { mutableStateOf(favoriteIds.contains(mealDetails.meals[0].idMeal ?: "")) }
+                    Card(
+                        modifier = Modifier.size(48.dp).padding(4.dp),
+                        shape = RoundedCornerShape(20),
+                    ){
+                        Image(
+                            painterResource(id =
+                            if (isFavorite.value) R.drawable.heart_select else R.drawable.heart),
+                            contentDescription = null,
+                            modifier = Modifier.padding(4.dp)
+                                .size(24.dp)
+                                .clickable {
+                                    isFavorite.value = !isFavorite.value
+                                    if (isFavorite.value) {
+                                        favoriteViewModel.addFavRecipe(
+                                            Recipe(
+                                                idMeal = mealDetails.meals[0].idMeal,
+                                                strMeal = mealDetails.meals[0].strMeal ?: "",
+                                                strMealThumb = mealDetails.meals[0].strMealThumb,
+                                                isSelected = true
+                                            )
+                                        )
+                                    } else {
+                                        favoriteViewModel.deleteFavRecipe(mealDetails.meals[0].idMeal ?: "")
+                                    }
+                                }
+                        )
+                    }
+
 
                 }
 
@@ -142,7 +230,7 @@ lateinit var navigator : Navigator
                     text = meal.strMeal ?: "",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = senFontFamily,
+                    fontFamily = poppins,
                     color = colorResource(id = R.color.darkBlue)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -179,7 +267,7 @@ lateinit var navigator : Navigator
                 Text(
                     text = "Ingredients",
                     color = colorResource(id = R.color.darkBlue),
-                    fontFamily = senFontFamily,
+                    fontFamily = poppins,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                 )
@@ -204,14 +292,14 @@ lateinit var navigator : Navigator
                             Text(
                                 text = "$ingredient : ",
                                 color = colorResource(id = R.color.darkBlue),
-                                fontFamily = senFontFamily,
+                                fontFamily = poppins,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                             )
                             Text(
                                 text = measure,
                                 color = Color.Gray,
-                                fontFamily = senFontFamily,
+                                fontFamily = poppins,
                                 fontWeight = FontWeight.Normal,
                                 fontSize = 13.sp,
                             )
@@ -297,7 +385,7 @@ lateinit var navigator : Navigator
                 text = value,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
-                fontFamily = senFontFamily
+                fontFamily = poppins
             )
         }
     }
